@@ -1,6 +1,9 @@
 #hide secrets
 secrets.py
 
+#hide db file
+*.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
