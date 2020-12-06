@@ -5,4 +5,5 @@ collects tweets and places them into sqlite
 ```
 conda create --name tweetminer python=3
 conda activate
+pip install -r requirements.txt
 ```
