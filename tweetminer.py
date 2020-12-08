@@ -8,7 +8,7 @@ from textblob import TextBlob
 
 
 database_name = 'female_rappers'
-tags = ['nicki minaj', 'cardib', 'megan thee stallion']
+tags = ['megan thee stallion', 'nicki minaj', 'cardib']
 
 
 class MineCart(tweepy.StreamListener):
@@ -58,10 +58,9 @@ def mine_tweets():
     conn.close()
     
     # start a stream for each category
-    stream_dict = {}
-    for index in range(len(tags)):
-        stream_dict[f'stream{index}'] = tweepy.Stream(auth=api.auth, listener=miner)
-        stream_dict[f'stream{index}'].filter(track=[tags[index]])
+    stream = tweepy.Stream(auth=api.auth, listener=miner)
+    stream.filter(track=tags)
+
 
 if __name__ == '__main__':
     mine_tweets()
