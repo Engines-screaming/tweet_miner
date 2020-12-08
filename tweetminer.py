@@ -7,7 +7,15 @@ import sqlite3
 from textblob import TextBlob
 
 
+database_name = 'female_rappers'
+tags = ['nicki minaj', 'cardib', 'megan thee stallion']
+
+
 class MineCart(tweepy.StreamListener):
+    '''Initialize with a list of category labels to put in the database'''
+
+    def __init__(self, categories):
+        self.categories = categories
 
     def on_data(self, data):
         data_dict = json.loads(data)
@@ -15,31 +23,16 @@ class MineCart(tweepy.StreamListener):
         tb = TextBlob(data_dict['text'])
 
         # establish db and insert 
-        conn = sqlite3.connect(f'wireless_tweets.db')
+        conn = sqlite3.connect(f'{database_name}.db')
         c = conn.cursor()
 
         # conditional insert based on filter
-        if 'ATT' in data_dict['text']:
-            category = 'ATT'
-            values = (data_dict['id_str'], category, data_dict['text'], tb.sentiment.polarity)
-            c.execute(f'''INSERT INTO tweets VALUES {values}''')
-            conn.commit()
-            print('tweet inserted to db')
-
-        if 'Verizon' in data_dict['text']:
-            category = 'VZN'
-            values = (data_dict['id_str'], category, data_dict['text'], tb.sentiment.polarity)
-            c.execute(f'''INSERT INTO tweets VALUES {values}''')
-            conn.commit()
-            print('tweet inserted to db')
-            
-        if 'Tmobile' in data_dict['text']:
-            category = 'TMO'
-            values = (data_dict['id_str'], category, data_dict['text'], tb.sentiment.polarity)
-            c.execute(f'''INSERT INTO tweets VALUES {values}''')
-            conn.commit()
-            print('tweet inserted to db')
-
+        for category in self.categories:
+            if category in data_dict['text']:
+                values = (data_dict['id_str'], category, data_dict['text'], tb.sentiment.polarity)
+                c.execute(f'''INSERT INTO tweets VALUES {values}''')
+                conn.commit()
+                print('tweet inserted to db')
 
         conn.close()
 
@@ -54,27 +47,21 @@ def mine_tweets():
     auth = tweepy.OAuthHandler(api_key, api_key_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-    miner = MineCart()
+    miner = MineCart(tags)
 
     # start database
-    conn = sqlite3.connect('wireless_tweets.db')
+    conn = sqlite3.connect(f'{database_name}.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS tweets
                     (tweet_id TEXT PRIMARY KEY, carrier TEXT, tweet TEXT, sentiment_score REAL)''')
     conn.commit()
     conn.close()
     
-    # att stream
-    att_stream = tweepy.Stream(auth=api.auth, listener=miner)
-    att_stream.filter(track=['ATT'])
-
-    # verizon stream
-    vzn_stream = tweepy.Stream(auth=api.auth, listener=miner)
-    vzn_stream.filter(track=['Verizon'])
-
-    # tmo stream
-    tmo_stream = tweepy.Stream(auth=api.auth, listener=miner)
-    tmo_stream.filter(track=['Tmobile'])
+    # start a stream for each category
+    stream_dict = {}
+    for index in range(len(tags)):
+        stream_dict[f'stream{index}'] = tweepy.Stream(auth=api.auth, listener=miner)
+        stream_dict[f'stream{index}'].filter(track=[tags[index]])
 
 if __name__ == '__main__':
     mine_tweets()
