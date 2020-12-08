@@ -7,8 +7,8 @@ import sqlite3
 from textblob import TextBlob
 
 
-database_name = 'female_rappers'
-tags = ['megan thee stallion', 'nicki minaj', 'cardib']
+database_name = 'wireless'
+tags = ['@ATT', '@Verizon', '@Tmobile']
 
 
 class MineCart(tweepy.StreamListener):
@@ -53,7 +53,7 @@ def mine_tweets():
     conn = sqlite3.connect(f'{database_name}.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS tweets
-                    (tweet_id TEXT PRIMARY KEY, carrier TEXT, tweet TEXT, sentiment_score REAL)''')
+                    (tweet_id TEXT PRIMARY KEY, category TEXT, tweet TEXT, sentiment_score REAL)''')
     conn.commit()
     conn.close()
     
