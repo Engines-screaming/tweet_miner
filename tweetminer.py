@@ -19,7 +19,7 @@ class MineCart(tweepy.StreamListener):
 
     def on_data(self, data):
         data_dict = json.loads(data)
-        
+
         tb = TextBlob(data_dict['text'])
 
         # establish db and insert 
@@ -29,7 +29,7 @@ class MineCart(tweepy.StreamListener):
         # conditional insert based on filter
         for category in self.categories:
             if category in data_dict['text']:
-                values = (data_dict['id_str'], category, data_dict['text'], tb.sentiment.polarity)
+                values = (category, data_dict['text'], tb.sentiment.polarity)
                 c.execute(f'''INSERT INTO tweets VALUES {values}''')
                 conn.commit()
                 print('tweet inserted to db')
@@ -53,7 +53,7 @@ def mine_tweets():
     conn = sqlite3.connect(f'{database_name}.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS tweets
-                    (tweet_id TEXT PRIMARY KEY, category TEXT, tweet TEXT, sentiment_score REAL)''')
+                    (category TEXT, tweet TEXT, sentiment_score REAL)''')
     conn.commit()
     conn.close()
     
