@@ -8,14 +8,16 @@ from textblob import TextBlob
 
 
 database_name = 'wireless'
-tags = ['@ATT', '@Verizon', '@Tmobile']
+tags = ['@ATT', '@Verizon', '@TMobile']
 
 
 class MineCart(tweepy.StreamListener):
     '''Initialize with a list of category labels to put in the database'''
 
-    def __init__(self, categories):
+    def __init__(self, categories, verbose=False):
         self.categories = categories
+        self.verbose = verbose
+        self.tweets_stored = 0
 
     def on_data(self, data):
         data_dict = json.loads(data)
@@ -32,7 +34,12 @@ class MineCart(tweepy.StreamListener):
                 values = (category, tb.sentiment.polarity)
                 c.execute(f'''INSERT INTO tweets VALUES {values}''')
                 conn.commit()
-                print('tweet inserted to db')
+
+                if self.verbose:
+                    print(data_dict['text'])
+
+                self.tweets_stored += 1
+                print(f'{self.tweets_stored} tweet(s) stored in db')
 
         conn.close()
 
