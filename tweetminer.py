@@ -25,7 +25,7 @@ class MineCart(tweepy.StreamListener):
         tb = TextBlob(data_dict['text'])
 
         # establish db and insert 
-        conn = sqlite3.connect(f'{database_name}.db')
+        conn = sqlite3.connect(f'data/{database_name}.db')
         c = conn.cursor()
 
         # conditional insert based on filter
@@ -57,7 +57,7 @@ def mine_tweets():
     miner = MineCart(tags)
 
     # start database
-    conn = sqlite3.connect(f'{database_name}.db')
+    conn = sqlite3.connect(f'data/{database_name}.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS tweets
                     (category TEXT, sentiment_score REAL)''')
