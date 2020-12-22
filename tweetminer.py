@@ -7,8 +7,8 @@ import sqlite3
 from textblob import TextBlob
 
 
-database_name = 'wireless'
-tags = ['@ATT', '@Verizon', '@TMobile']
+database_name = 'food'
+tags = ['hotdog', 'pizza', 'burger', 'taco']
 
 
 class MineCart(tweepy.StreamListener):
@@ -18,6 +18,14 @@ class MineCart(tweepy.StreamListener):
         self.categories = categories
         self.verbose = verbose
         self.tweets_stored = 0
+
+    def clean_tweet(self, tweet):
+        '''method to clean the tweet before inserting to db'''
+
+        removed_quote = tweet.replace("'", "")
+        cleaned = removed_quote.lower()
+
+        return cleaned
 
     def on_data(self, data):
         data_dict = json.loads(data)
@@ -29,10 +37,18 @@ class MineCart(tweepy.StreamListener):
         c = conn.cursor()
 
         # conditional insert based on filter
+        cleaned_text = self.clean_tweet(data_dict['text']) # clean text for category matching
         for category in self.categories:
-            if category in data_dict['text']:
-                values = (category, tb.sentiment.polarity)
-                c.execute(f'''INSERT INTO tweets VALUES {values}''')
+            if category in cleaned_text:
+                values = (category, cleaned_text, tb.sentiment.polarity)
+
+                try:
+                    c.execute(f'''INSERT INTO tweets VALUES {values};''')
+                except Exception as e:
+                    print(e)
+                    print(values)
+                    raise Exception
+
                 conn.commit()
 
                 if self.verbose:
@@ -60,7 +76,7 @@ def mine_tweets():
     conn = sqlite3.connect(f'data/{database_name}.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS tweets
-                    (category TEXT, sentiment_score REAL)''')
+                    (category TEXT, tweet TEXT, sentiment_score REAL)''')
     conn.commit()
     conn.close()
     
