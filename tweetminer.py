@@ -7,11 +7,11 @@ import sqlite3
 from textblob import TextBlob
 
 
-# database_name = 'femalerappers'
-# tags = ['@theestallion', '@iamcardib', '@NICKIMINAJ']
+database_name = 'femalerappers'
+tags = ['@theestallion', '@iamcardib', '@NICKIMINAJ']
 
-database_name = 'bachelorettes'
-tags = ['@tayshia', '@Claire_Crawley']
+# database_name = 'bachelorettes'
+# tags = ['@tayshia', '@Claire_Crawley']
 
 
 class MineCart(tweepy.StreamListener):
