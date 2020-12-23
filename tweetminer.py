@@ -7,8 +7,11 @@ import sqlite3
 from textblob import TextBlob
 
 
-database_name = 'food'
-tags = ['hotdog', 'pizza', 'burger', 'taco']
+# database_name = 'femalerappers'
+# tags = ['@theestallion', '@iamcardib', '@NICKIMINAJ']
+
+database_name = 'bachelorettes'
+tags = ['@tayshia', '@Claire_Crawley']
 
 
 class MineCart(tweepy.StreamListener):
@@ -39,7 +42,7 @@ class MineCart(tweepy.StreamListener):
         # conditional insert based on filter
         cleaned_text = self.clean_tweet(data_dict['text']) # clean text for category matching
         for category in self.categories:
-            if category in cleaned_text:
+            if category.lower() in cleaned_text:
                 values = (category, cleaned_text, tb.sentiment.polarity)
 
                 try:
