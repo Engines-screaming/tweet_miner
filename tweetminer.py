@@ -10,9 +10,6 @@ from textblob import TextBlob
 database_name = 'femalerappers'
 tags = ['@theestallion', '@iamcardib', '@NICKIMINAJ']
 
-# database_name = 'bachelorettes'
-# tags = ['@tayshia', '@Claire_Crawley']
-
 
 class MineCart(tweepy.StreamListener):
     '''Initialize with a list of category labels to put in the database'''
